@@ -1,0 +1,625 @@
+<!-- 
+  ASSET REPLACEMENT GUIDE:
+  - Founder carousel photos:
+    Replace 'path/to/photo1.jpg', 'path/to/photo2.jpg', etc. in the carousel section (~line 500).
+  - Background music:
+    Replace 'path/to/your/music.mp3' inside the <audio id="bgMusic"> tag (~line 260).
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ever Aura - Grand Inauguration</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Luxury Aesthetic (Cinzel & Cormorant Garamond) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Cinzel:wght@600;700;900&family=Cormorant+Garamond:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- NEW: Confetti.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    
+    <style>
+      body::before, body::after {
+        content: '💍 ✨';
+        position: fixed;
+        font-size: 1.5rem;
+        opacity: 0.15;
+        color: #C5A572;
+        z-index: 1;
+      }
+      body::before { top: 20%; left: 5%; transform: rotate(-15deg); }
+      body::after { bottom: 15%; right: 10%; transform: rotate(10deg); }
+        /* Custom styles for the royal feel */
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            /* Midnight navy/grey white gradient background */
+            background: linear-gradient(180deg, #F5F5F5 0%, #E8E8E8 100%);
+        }
+
+        /* Luxury serif for main headings */
+        .font-serif-display {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 1px;
+        }
+        .font-body-luxury {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        /* Custom shimmer animation for the "Congratulations" text */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        .animate-shimmer {
+            /* Gold and light grey shimmer */
+            background: linear-gradient(to right, #C5A572 20%, #F5F5F5 40%, #F5F5F5 60%, #C5A572 80%);
+            background-size: 2000px auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: shimmer 4s linear infinite;
+        }
+
+        /* Custom fade-in and fade-out animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .animate-fade-out {
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        /* Ensure images don't break layout */
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem; /* rounded corners for all images */
+        }
+
+        /* NEW: Styles for the curtain transition */
+        #curtainTransition {
+            transition: none; /* Parent doesn't transition */
+        }
+        #curtainLeft, #curtainRight {
+            /* Midnight Navy for curtains */
+            background-color: #0B132B;
+            /* Elegant easing for a smooth, heavy curtain feel */
+            transition: transform 1.0s cubic-bezier(0.77, 0, 0.175, 1); 
+        }
+
+        /* NEW: Custom brand color classes (Updated to Midnight Navy/Gold palette) */
+        .text-brand-primary { color: #0B132B; }
+        .bg-brand-primary { background-color: #0B132B; }
+        .border-brand-primary { border-color: #0B132B; }
+        .hover-bg-brand-primary-dark:hover { background-color: #C5A572; } /* Soft Gold as accent on hover */
+        .hover-text-brand-primary:hover { color: #C5A572; }
+
+        /* --- NEW: Ribbon Cutting Styles --- */
+
+        /* The scissors icon */
+        #scissors {
+            transition: transform 0.2s ease-out;
+            cursor: pointer;
+        }
+        
+        /* The "snip" animation for the scissors */
+        @keyframes snip {
+            0% { transform: rotate(0deg) scale(1.1); }
+            50% { transform: rotate(10deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1.1); }
+        }
+        .animate-snip {
+            animation: snip 0.3s ease-out;
+        }
+
+        /* The ribbon itself (a container) */
+        #ribbonContainer {
+            width: 150%; /* Go wider than the container to look like it stretches across */
+            left: -25%;
+            overflow: hidden; /* Hide the "cut" ends as they fall */
+        }
+
+        /* The two halves of the ribbon */
+        #ribbonLeft, #ribbonRight {
+            height: 80px; /* Nice thick ribbon */
+            /* Ribbon gradient: midnight navy → gold → midnight navy */
+            background: linear-gradient(to right, #0B132B, #C5A572, #0B132B);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 1.2s cubic-bezier(0.6, -0.28, 0.735, 0.045); /* Ease-in-back for falling */
+        }
+
+        /* Animation for the ribbon halves falling */
+        .ribbon-fall-left {
+            transform-origin: top left;
+            transform: translateY(80vh) rotate(-30deg) !important;
+        }
+        .ribbon-fall-right {
+            transform-origin: top right;
+            transform: translateY(80vh) rotate(30deg) !important;
+        }
+
+        /* --- NEW: Glitter Particle Styles --- */
+        #particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 40; /* Just below the curtains(50)/overlays(100) */
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            bottom: -10px; /* Start just off-screen */
+            /* Gold and grey particles */
+            background: radial-gradient(circle at 30% 30%, #C5A572 65%, #F5F5F5 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: glitter 15s linear infinite;
+        }
+
+        @keyframes glitter {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                /* Appear and start rising */
+                opacity: 0.8;
+            }
+            90% {
+                /* Still visible near the top */
+                opacity: 0.8;
+            }
+            100% {
+                /* Rise all the way to the top and fade out */
+                transform: translateY(-100vh) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        /* --- NEW: Animation for owner's name --- */
+        @keyframes fadeInDelay {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-delay {
+            /* This animation will be triggered by JS *after* the curtain opens */
+            animation: fadeInDelay 1s ease-out 0.5s forwards; /* 0.5s delay */
+        }
+    </style>
+
+    <!-- Tailwind Config for new colors -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'brand-primary': '#0B132B', // Midnight Navy
+              'brand-primary-dark': '#C5A572', // Soft Gold as hover/dark
+              'brand-accent': '#C5A572', // Soft Gold
+              'brand-bg-accent': '#F5F5F5', // Grey White
+              'brand-heading': '#1C2541', // Deep Navy for headings
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="min-h-screen flex items-center justify-center overflow-x-hidden font-body-luxury">
+
+    <!-- NEW: WOW Factor - Glitter Particle Container -->
+    <div id="particle-container"></div>
+
+    <!-- 
+      MUSIC PLACEHOLDER
+      - Find a royal, classical, or celebratory .mp3 file.
+      - Add it to your project and replace "path/to/your/music.mp3" below.
+      - Removed 'autoplay' to fix browser policy errors. Music will play on first click.
+    -->
+    <audio id="bgMusic" src="bg.mp3" loop></audio>
+
+    <!-- 
+      NEW: Curtain Transition Layer
+      (Initially hidden off-screen, covers everything when active)
+    -->
+    <div id="curtainTransition" class="fixed inset-0 z-50 pointer-events-none flex">
+        <div id="curtainLeft" class="flex-1" style="transform: translateX(-100%);"></div>
+        <div id="curtainRight" class="flex-1" style="transform: translateX(100%);"></div>
+    </div>
+
+
+    <!-- 
+      PAGE 1: The "Curtain" / Unveiling Screen 
+    -->
+    <div id="curtainScreen" class="min-h-screen w-full p-4 sm:p-6 flex items-center justify-center">
+        <!-- LAYOUT CHANGE: Removed flex-row and made one centered column -->
+        <div class="w-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-6 sm:gap-8 opacity-0 animate-fade-in">
+            
+            <!-- Text Content -->
+            <div class="flex flex-col justify-center items-center text-center space-y-6 sm:space-y-8">
+                
+                <!-- "Presented by" text -->
+                <div>
+                    <!-- COLOR CHANGE: Updated to new brand color -->
+                    <p class="text-xs sm:text-sm text-brand-primary uppercase tracking-widest">Presented By</p>
+                    <!-- MedioFusion Logo Placeholder -->
+                    <div class="mt-2 sm:mt-3 flex items-center justify-center">
+                        <img src="logom.svg" alt="MedioFusion Logo" class="h-12 sm:h-16 object-contain" />
+                      </div>
+                </div>
+
+                <!-- Main Heading -->
+                <div class="space-y-2 sm:space-y-4">
+                    <h1 class="font-serif-display font-bold text-3xl sm:text-5xl md:text-6xl lg:text-7xl" style="color:#1C2541;">
+                        The Grand Inauguration
+                    </h1>
+                    <p class="text-lg sm:text-2xl" style="color:#1C2541;">of</p>
+                </div>
+                
+                <!-- Ever Aura Logo Placeholder -->
+                <!-- COLOR CHANGE: Updated to new brand color -->
+                <div class="flex items-center justify-center">
+                    <img src="logoa.png" alt="Ever Aura Logo" class="w-48 sm:w-64 md:w-80 object-contain" />
+                  </div>
+
+                <!-- NEW: Ribbon Cutting Interaction -->
+                <!-- Replaces the old "Click to Unveil" button -->
+                <div id="ribbonCutting" class="mt-8 sm:mt-12 w-full flex flex-col items-center justify-center relative">
+                    <!-- The Ribbon -->
+                    <div id="ribbonContainer" class="absolute z-10 w-full flex">
+                        <div id="ribbonLeft" class="flex-1"></div>
+                        <div id="ribbonRight" class="flex-1"></div>
+                    </div>
+                    
+                    <!-- The Scissors -->
+                    <!-- This is the new "button" -->
+                    <div id="scissors" title="Click to cut the ribbon" class="relative z-20 text-gray-900 p-3 sm:p-4 bg-gray-50 rounded-full shadow-xl">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.843 16.277L16.157 7.963m-8.314 8.314L12 12m0 0l4.157-4.157m-4.157 4.157L7.843 7.963m4.157 4.037L16.157 16.277m-8.314-8.314L12 12m0 0l4.157 4.157M12 12L7.843 16.277m0-8.314L16.157 7.963" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 00-2.25-2.25H9.75A2.25 2.25 0 007.5 6v2.25m9 0v2.25A2.25 2.25 0 0114.25 12.75H9.75A2.25 2.25 0 017.5 10.5V8.25m9 0H7.5" />
+                        </svg>
+                    </div>
+
+                    <p class="mt-10 sm:mt-20 text-base sm:text-lg" style="color:#1C2541;font-weight:600;">
+                        Click the scissors to cut the ribbon
+                    </p>
+                    <p id="volumePrompt" class="mt-4 text-sm text-brand-primary italic opacity-70 animate-pulse">
+                        🔊 For the full experience, please ensure your volume is up.
+                    </p>
+                </div>
+            </div>
+
+            <!-- LAYOUT CHANGE: Removed the side-image placeholder -->
+        </div>
+    </div>
+
+    <!-- 
+      PAGE 2: The "Reveal" Screen (Initially Hidden)
+    -->
+    <div id="revealScreen" class="hidden min-h-screen w-full p-4 sm:p-6 flex items-center justify-center">
+        <!-- LAYOUT CHANGE: Removed flex-row and made one centered column -->
+        <div class="w-full max-w-3xl mx-auto flex flex-col items-center justify-center gap-6 sm:gap-8 animate-fade-in" style="animation-delay:.25s;">
+
+            <!-- Text & Link Content -->
+            <div class="flex flex-col justify-center items-center text-center space-y-6 sm:space-y-8">
+                
+                <!-- NEW: Ever Aura Logo added to reveal screen -->
+                <!-- COLOR CHANGE: Updated to new brand color -->
+                <div class="flex items-center justify-center">
+                    <img src="logoa.png" alt="Ever Aura Logo" class="w-48 sm:w-64 md:w-80 object-contain" />
+                  </div>
+                
+                <!-- Shimmering "Congratulations" Text -->
+                <h1 class="font-serif-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl animate-shimmer" style="color:#1C2541;">
+                    Congratulations!
+                </h1>
+
+                <!-- 
+                  NEW: WOW Factor - Personalized Name 
+                  - Replace [Owner's Name Here] with the owner's actual name.
+                -->
+                <h2 class="font-serif-display text-2xl sm:text-4xl opacity-0" id="ownerNameReveal" style="color:#1C2541;">
+                    Vibha Wadhwani
+                </h2>
+
+                <p class="text-base sm:text-lg md:text-xl max-w-lg text-center px-4" style="color:#1C2541;">
+                    A new era of elegance has begun. The official website for <span class="font-bold text-brand-primary">Ever Aura</span> is now live.
+                </p>
+
+                <!-- ✨ Hardcoded Personal Blessing -->
+                <div class="w-full max-w-lg text-center">
+                    <blockquote id="generatedMessage" class="mt-6 p-4" style="background:#F5F5F5; border-left:4px solid #C5A572; color:#1C2541; font-style:italic;">
+                        "Today marks not just a launch, but the dawn of a new standard in elegance. Our heartfelt congratulations to Ever Aura. May this partnership flourish and inspire."
+                        <br><br>
+                        <span class="font-bold not-italic" style="color:#0B132B;">– The MedioFusion Team (Rochak Kr. Jain)</span>
+                    </blockquote>
+                </div>
+
+                <!-- The Link to the Main Site -->
+                <div>
+                    <!-- LINK PLACEHOLDER: Replace "#" with the owner's actual website URL. -->
+                    <a href="#" id="mainSiteLink" target="_blank" rel="noopener noreferrer" 
+                       class="inline-block mt-4 sm:mt-6 px-8 sm:px-14 py-4 sm:py-5 rounded-full shadow-lg shadow-black/20 transform transition-all duration-300 font-bold text-lg sm:text-xl uppercase"
+                       style="background:linear-gradient(90deg,#C5A572 0%,#0B132B 100%); color:white; box-shadow:0 0 24px 0 #C5A57299;">
+                        Visit the Website
+                    </a>
+                </div>
+            </div>
+
+            <!-- "Commemorating the Moment" replaced with Founder Carousel -->
+            <div class="p-2 sm:p-4 w-full max-w-2xl mx-auto text-center">
+                <p class="text-sm sm:text-base mb-2 sm:mb-4" style="color:#0B132B;">Commemorating the Moment</p>
+                <div id="carousel" class="relative overflow-hidden rounded-xl shadow-2xl">
+                  <div id="carouselImages" class="flex transition-transform duration-700 ease-in-out">
+                    <div class="flex-shrink-0 w-full">
+                      <img src="a.png" alt="Vibha Wadhwani - Founder EverAura" class="w-full h-64 sm:h-80 md:h-96 max-h-[70vh] object-cover">
+                    </div>
+                    <div class="flex-shrink-0 w-full">
+                      <img src="b.png" alt="Rochak Kr. Jain - Founder MedioFusion" class="w-full h-64 sm:h-80 md:h-96 max-h-[70vh] object-cover">
+                    </div>
+                    <div class="flex-shrink-0 w-full">
+                      <img src="v.png" alt="Vibha Wadhwani - Founder EverAura" class="w-full h-64 sm:h-80 md:h-96 max-h-[70vh] object-cover">
+                    </div>
+                    <div class="flex-shrink-0 w-full">
+                      <img src="d.png" alt="Rochak Kr. Jain - Founder MedioFusion" class="w-full h-64 sm:h-80 md:h-96 max-h-[70vh] object-cover">
+                    </div>
+                  </div>
+                  <button id="prevBtn" class="absolute left-3 top-1/2 transform -translate-y-1/2 bg-[#0B132B] text-white p-2 rounded-full opacity-70 hover:opacity-100">‹</button>
+                  <button id="nextBtn" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[#0B132B] text-white p-2 rounded-full opacity-70 hover:opacity-100">›</button>
+                </div>
+                <p class="text-xs sm:text-sm mt-1 sm:mt-2" style="color:#1C2541;">Vibha Wadhwani, Founder EverAura &amp; Rochak Kr. Jain, Founder MedioFusion</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Volume "Flash" Prompt -->
+    <!-- COLOR CHANGE: Updated hover to new brand color -->
+    <div title="Turn up volume for the full experience" class="absolute bottom-6 right-6 text-gray-400 animate-pulse hover-text-brand-primary transition-colors cursor-pointer" onclick="document.getElementById('bgMusic').play()" style="z-index:110;">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 1.106a.75.75 0 01.75.75v16.288a.75.75 0 01-1.5 0V1.856a.75.75 0 01.75-.75zM5.22 4.41a.75.75 0 01.03 1.06l-.03.03-2.32 2.32a.75.75 0 01-1.06 0l-.03-.03a.75.75 0 010-1.06l.03-.03 2.32-2.32a.75.75 0 011.06 0zm9.56 0a.75.75 0 011.06 0l.03.03 2.32 2.32a.75.75 0 010 1.06l-.03.03a.75.75 0 01-1.06 0l-.03-.03-2.32-2.32a.75.75 0 010-1.06l.03-.03zM5.22 14.41a.75.75 0 01.03-1.06l-.03-.03-2.32-2.32a.75.75 0 01-1.06 0l-.03.03a.75.75 0 010 1.06l.03.03 2.32 2.32a.75.75 0 011.06 0zm9.56 0a.75.75 0 011.06 0l.03.03 2.32 2.32a.75.75 0 010 1.06l-.03.03a.75.75 0 01-1.06 0l-.03-.03-2.32-2.32a.75.75 0 010-1.06l.03-.03z" />
+        </svg>
+    </div>
+
+    <!-- 
+      NEW: Confetti & Countdown Overlay 
+    -->
+    <div id="confettiOverlay" class="hidden fixed inset-0 z-[100] bg-black/70 flex items-center justify-center">
+        <span id="countdownTimer" class="text-white text-9xl font-serif-display font-bold">3</span>
+        <!-- Canvas for confetti -->
+        <canvas id="confettiCanvas" class="absolute inset-0 w-full h-full"></canvas>
+    </div>
+
+    <script>
+        // --- Founder Carousel Functionality ---
+        document.addEventListener('DOMContentLoaded', () => {
+          const carouselImages = document.getElementById('carouselImages');
+          if (!carouselImages) return;
+          const totalSlides = carouselImages.children.length;
+          let currentIndex = 0;
+          function updateCarousel() {
+            carouselImages.style.transform = `translateX(-${currentIndex * 100}%)`;
+          }
+          document.getElementById('nextBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+          });
+          document.getElementById('prevBtn').addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+          });
+          setInterval(() => {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+          }, 5000);
+        });
+        // --- Original DOM Elements ---
+        const curtainScreen = document.getElementById('curtainScreen');
+        const revealScreen = document.getElementById('revealScreen');
+        const bgMusic = document.getElementById('bgMusic');
+
+        // --- Curtain Animation Elements ---
+        const curtainTransition = document.getElementById('curtainTransition');
+        const curtainLeft = document.getElementById('curtainLeft');
+        const curtainRight = document.getElementById('curtainRight');
+        
+        // --- Confetti & Countdown Elements ---
+        const mainSiteLink = document.getElementById('mainSiteLink');
+        const confettiOverlay = document.getElementById('confettiOverlay');
+        const countdownTimer = document.getElementById('countdownTimer');
+        const confettiCanvas = document.getElementById('confettiCanvas');
+
+        // --- NEW: Ribbon Elements ---
+        const scissors = document.getElementById('scissors');
+        const ribbonLeft = document.getElementById('ribbonLeft');
+        const ribbonRight = document.getElementById('ribbonRight');
+        let isRibbonCut = false; // Prevents double-clicking
+
+        // --- NEW: Owner Name Element ---
+        const ownerNameReveal = document.getElementById('ownerNameReveal');
+
+        // --- Event Listeners ---
+
+        // NEW: Ribbon Cutting "Button"
+        scissors.addEventListener('click', () => {
+            if (isRibbonCut) return; // Don't run if already clicked
+            isRibbonCut = true;
+
+            // 1. Play "snip" animation
+            scissors.classList.add('animate-snip');
+
+            // 2. Play "ribbon falling" animation
+            ribbonLeft.classList.add('ribbon-fall-left');
+            ribbonRight.classList.add('ribbon-fall-right');
+
+            // 3. Try to play the music
+            bgMusic.play().catch(error => {
+                console.warn("Audio play failed, user may need to interact first.", error);
+            });
+
+            // 4. After a short delay (for animation), start the curtain transition
+            setTimeout(() => {
+                // Make transition layer active
+                curtainTransition.classList.remove('pointer-events-none');
+
+                // Curtains CLOSE
+                curtainLeft.style.transform = 'translateX(0)';
+                curtainRight.style.transform = 'translateX(0)';
+            }, 500); // Wait for snip animation
+
+            // 5. After curtains close (1s), swap content and OPEN
+            setTimeout(() => {
+                // Swap the pages
+                curtainScreen.classList.add('hidden');
+                revealScreen.classList.remove('hidden');
+                revealScreen.classList.add('animate-fade-in'); // Content fades in
+
+                // NEW: Trigger the owner's name reveal animation
+                ownerNameReveal.classList.add('animate-fade-in-delay');
+
+                // Curtains OPEN
+                curtainLeft.style.transform = 'translateX(-100%)';
+                curtainRight.style.transform = 'translateX(100%)';
+                
+                // 6. Disable transition layer after it's gone (1s)
+                setTimeout(() => {
+                    curtainTransition.classList.add('pointer-events-none');
+                }, 1000); // Match transition duration
+
+            }, 1500); // 500ms (snip) + 1000ms (curtain close)
+        });
+
+
+        // --- Confetti & Countdown Logic ---
+        mainSiteLink.addEventListener('click', (event) => {
+            // 1. Prevent the link from opening immediately
+            event.preventDefault();
+            const targetUrl = event.currentTarget.href;
+            
+            // 2. Show the overlay
+            confettiOverlay.classList.remove('hidden');
+
+            // 3. Setup and launch confetti
+            const myConfetti = confetti.create(confettiCanvas, {
+                resize: true,
+                useWorker: true
+            });
+
+            const duration = 3 * 1000; // 3 seconds
+            // BUG FIX: Changed Date.Now() to Date.now()
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(() => {
+                // BUG FIX: Changed Date.Now() to Date.now()
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+                const particleCount = 50 * (timeLeft / duration);
+                // Shoot from both sides
+                myConfetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                myConfetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+
+
+            // 4. Start the timer
+            countdownTimer.textContent = '3';
+            setTimeout(() => {
+                countdownTimer.textContent = '2';
+            }, 1000);
+            setTimeout(() => {
+                countdownTimer.textContent = '1';
+            }, 2000);
+            
+            // 5. After 3 seconds, redirect
+            setTimeout(() => {
+                window.open(targetUrl, '_blank');
+                // Hide the overlay again in case the user comes back
+                confettiOverlay.classList.add('hidden');
+            }, 3000);
+        });
+
+
+        // Optional: If you want to check if the audio started
+        bgMusic.addEventListener('play', () => {
+            console.log('Background music is playing.');
+        });
+
+        // --- NEW: WOW Factor - Glitter Particle Generation ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const particleContainer = document.getElementById('particle-container');
+            if (particleContainer) {
+                const particleCount = 50; // Number of particles
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    const size = Math.random() * 4 + 2; // Size 2px to 6px
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}vw`;
+                    const delay = Math.random() * 15;
+                    particle.style.animationDelay = `${delay}s`;
+                    const duration = Math.random() * 10 + 10;
+                    particle.style.animationDuration = `${duration}s`;
+                    // Alternate color: gold or grey
+                    if (i % 2 === 0) {
+                        particle.style.background = 'radial-gradient(circle at 30% 30%, #C5A572 65%, #F5F5F5 100%)';
+                    } else {
+                        particle.style.background = 'radial-gradient(circle at 70% 70%, #F5F5F5 70%, #C5A572 100%)';
+                    }
+                    particleContainer.appendChild(particle);
+                }
+            }
+        });
+
+        // --- Responsive tweaks for mobile ---
+        // Adjust curtain transition for small screens
+        function adjustCurtainForMobile() {
+          const isMobile = window.innerWidth < 640;
+          const curtainLeft = document.getElementById('curtainLeft');
+          const curtainRight = document.getElementById('curtainRight');
+          if (curtainLeft && curtainRight) {
+            curtainLeft.style.minWidth = isMobile ? '50vw' : '';
+            curtainRight.style.minWidth = isMobile ? '50vw' : '';
+          }
+        }
+        window.addEventListener('resize', adjustCurtainForMobile);
+        document.addEventListener('DOMContentLoaded', adjustCurtainForMobile);
+    </script>
+
+    <!-- Button Gradient and Glow on Hover (Moved here for proper execution) -->
+    <script>
+      // --- Button Gradient and Glow on Hover ---
+      document.addEventListener('DOMContentLoaded', () => {
+        const mainSiteLink = document.getElementById('mainSiteLink');
+        if (mainSiteLink) {
+          mainSiteLink.addEventListener('mouseenter', () => {
+            mainSiteLink.style.boxShadow = '0 0 32px 8px #C5A57277';
+          });
+          mainSiteLink.addEventListener('mouseleave', () => {
+            mainSiteLink.style.boxShadow = '0 0 24px 0 #C5A57299';
+          });
+        }
+      });
+    </script>
+
+</body>
+</html>
