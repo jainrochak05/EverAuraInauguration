@@ -228,9 +228,9 @@
       MUSIC PLACEHOLDER
       - Find a royal, classical, or celebratory .mp3 file.
       - Add it to your project and replace "path/to/your/music.mp3" below.
-      - Removed 'autoplay' to fix browser policy errors. Music will play on first click.
     -->
-    <audio id="bgMusic" src="bg.mp3" loop></audio>
+    <!-- Autoplay is now enabled for background music. Note: Some browsers may require user interaction before playback starts, especially on mobile devices. -->
+    <audio id="bgMusic" src="bg.mp3" autoplay loop playsinline></audio>
 
     <!-- 
       NEW: Curtain Transition Layer
